@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item
+        android:id="@+id/one"
+        android:icon="@drawable/ic_one"
+        android:title="один"
+        />
+    <item
+        android:id="@+id/two"
+        android:icon="@drawable/ic_two"
+        android:title="два"
+        />
+    <item
+        android:id="@+id/three"
+        android:icon="@drawable/ic_three"
+        android:title="три"
+        />
+    <item
+        android:id="@+id/four"
+        android:icon="@drawable/ic_four"
+        android:title="четыре"
+        />
+    <item
+        android:id="@+id/five"
+        android:icon="@drawable/ic_five"
+        android:title="пять"
+        />
+    <item
+        android:id="@+id/six"
+        android:icon="@drawable/ic_six"
+        android:title="шесть"
+        />
+    <item
+        android:id="@+id/seven"
+        android:icon="@drawable/ic_seven"
+        android:title="семь"
+        />
+
+
+
+</menu>

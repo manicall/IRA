@@ -1,4 +1,4 @@
-package com.example.tired10;
+package com.example.lab10;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         endPrice.setHint(priceToString(minMax[1]));
     }
 
+    // алгоритм поиска минимальной и максимальной цены
     private double[] minMax(ArrayList<Double> prices) {
         double min = prices.get(0);
         double max = prices.get(0);
@@ -119,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         return new double[]{min, max};
     }
-
+    // устанавливает обработку клика на кнопки
     private void setOnClickListeners() {
         Button bPrevious = findViewById(R.id.buttonPrevious);
         Button bNext = findViewById(R.id.buttonNext);
@@ -129,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bNext.setOnClickListener(this);
         bFind.setOnClickListener(this);
     }
-
+    // запоминает элементы отвечающие за вывод информации об автомобиле
     private void setInformationElements() {
         informationElements.add(findViewById(R.id.markName));
         informationElements.add(findViewById(R.id.markValue));
@@ -139,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         informationElements.add(findViewById(R.id.buttonPrevious));
         informationElements.add(findViewById(R.id.buttonNext));
     }
-
+    // скрывает интерфейс для вывода информации об автомобиле
     private void hideInformation() {
         if (isVisible) {
             for (View informationElement : informationElements)
@@ -147,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             isVisible = false;
         }
     }
-
+    // показывает интерфейс для вывода информации об автомобиле
     private void showInformation() {
         if (!isVisible) {
             for (View informationElement : informationElements)
@@ -155,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             isVisible = true;
         }
     }
-
+    // создает таблицы в базе данных с информацией об автомобилях
     private void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS cars (" +
                 "id INTEGER PRIMARY KEY, " +
@@ -163,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 "price REAL NOT NULL, " +
                 "picture BLOB)");
     }
-
+    // добавляет запись в таблицу об автомобилях
     private void addCar(SQLiteDatabase db, String mark, double price, byte[] picture) {
         ContentValues cv = new ContentValues();
         cv.put("mark", "'" + mark + "'");
@@ -172,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         db.insert("cars", null, cv);
     }
-
+    // выводит запись об автомобиле
     private void setDataFromCursor() {
         Car car = cars.get(currentCarId);
 
@@ -190,33 +191,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonNext.setEnabled(currentCarId == cars.size() - 1 ? false : true);
     }
 
-    private void setCarPicture(byte[] blob) {
-        Bitmap bitmap = BitmapFactory.decodeByteArray(blob, 0, blob.length);
+    // устанавливает картинку извлеченную из таблицы SQLite
+    private void setCarPicture(byte[] blob){
+        // извлекаем bitmap из набора байт
+        Bitmap bitmap = BitmapFactory.decodeByteArray(blob, 0,blob.length);
+        /* устанавливаем bitmap в ImageView */
         ImageView carPicture = findViewById(R.id.carPicture);
         carPicture.setImageBitmap(bitmap);
     }
 
     // создаем записи таблицы
     private void addRecords(SQLiteDatabase db) {
-        db.execSQL("drop table if exists cars");
-        createTable(db);
+        db.execSQL("drop table if exists cars"); // удаляем таблицу cars
+        createTable(db); // создаем таблицу cars
 
-        addCar(db, "Audi Q5", 1000000.00, drawableToByteArray(R.mipmap.ic_Audi_Q5_foreground));
-        addCar(db, "BMW X3", 1000000.00, drawableToByteArray(R.mipmap.ic_bmw_x3_foreground));
-        addCar(db, "BMW X3", 1000000.00, drawableToByteArray(R.mipmap.ic_daewoo_gentra_2_foreground));
+        // добавляем записи о машинах
+        //addCar(db, "Audi Q5", 1000000.00, drawableToByteArray(R.mipmap.ic_Audi_Q5_foreground));
+        //addCar(db, "BMW X3", 1000000.00, drawableToByteArray(R.mipmap.ic_bmw_x3_foreground));
+        //addCar(db, "BMW X3", 1000000.00, drawableToByteArray(R.mipmap.ic_daewoo_gentra_2_foreground));
 
     }
 
-    private byte[] drawableToByteArray(int id) {
+    // переводит картинку в набор байт, для хранения этого набора в таблице SQLite
+    private byte[] drawableToByteArray(int id){
+        // получаем картинку из ресурсов
         Drawable d = getDrawable(id);
-        Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
+        // преобразуем картинку в bitmap
+        Bitmap bitmap = ((BitmapDrawable)d).getBitmap();
+        // создаем переменную хранящую поток байт
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        // преобразуем bitmap в набор байт
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
-        bitmap.recycle();
-        return byteArray;
+        // возвращаем массив байт
+        return stream.toByteArray();
     }
 
+    // обработчик клика на кнопку
     @Override
     public void onClick(View view) {
         if (isVisible) {
@@ -236,9 +246,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d("TAG", "onClick: " + currentCarId);
     }
 
-    private boolean isValidate() {
-        return currentCarId >= 0 && currentCarId < cars.size();
-    }
 
     public void find() {
         currentCarId = 0;
@@ -256,15 +263,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cars.clear();
         Cursor carCursor = db.rawQuery("SELECT * FROM cars WHERE price BETWEEN "
                 + startPrice + " AND " + endPrice + ";", null);
-        // добавление записей в список
+        // переход на первую запись в таблице
         carCursor.moveToFirst();
-        while (!carCursor.isAfterLast()) {
+        while(!carCursor.isAfterLast()){ // пока не конец таблицы
             cars.add(new Car(
-                    carCursor.getInt(0),
-                    deleteQuotes(carCursor.getString(1)),
-                    carCursor.getDouble(2),
-                    carCursor.getBlob(3)));
-            carCursor.moveToNext();
+                    carCursor.getInt(0), // id
+                    deleteQuotes(carCursor.getString(1)), // mark
+                    carCursor.getDouble(2), // price
+                    carCursor.getBlob(3))); // picture
+            carCursor.moveToNext(); // переход к следующией записи
         }
         carCursor.close();
     }
@@ -303,7 +310,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return Double.valueOf(price);
     }
 
-    private String deleteQuotes(String mark) {
+    // удаляет кавычки, которые извлекаются вместе с текстовой записью из таблицы SQLite
+    private String deleteQuotes(String mark){
         return mark.replace("\'", "");
     }
 }

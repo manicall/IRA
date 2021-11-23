@@ -3,7 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/max/IRA/tired10/app/src/main/res/drawable/ic_Audi Q5_background.xml" value="0.16203703703703703" />
+        <entry key="..\:/Users/max/IRA/tired10/app/src/main/res/drawable/ic_Audi_Q5_background.xml" value="0.14583333333333334" />
+        <entry key="..\:/Users/max/IRA/tired10/app/src/main/res/drawable/ic_daewoo_gentra_II_background.xml" value="0.14583333333333334" />
         <entry key="..\:/Users/max/IRA/tired10/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Users/max/IRA/tired10/app/src/main/res/mipmap-anydpi-v26/ic_daewoo_gentra_II.xml" value="0.1" />
+        <entry key="..\:/Users/max/IRA/tired10/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1037037037037037" />
       </map>
     </option>
   </component>

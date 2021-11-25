@@ -10,15 +10,18 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Locale;
@@ -32,6 +35,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int currentCarId = 0;
     // экземпляр базы данных
     SQLiteDatabase db;
+
+    String currentMark;
 
     boolean isVisible = true;
 
@@ -61,8 +66,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // HashSet - для исключения повторяющихся элементов
         // хранит множество всех марок автомобилей из бд
         HashSet<String> marks = new HashSet<>();
-        // хранит список всех цен автомобилей из бд
-        ArrayList<Double> prices = new ArrayList<>();
         // запрос на выборку всех данных из таблицы cars
         Cursor carCursor = db.rawQuery("SELECT * FROM cars;", null);
 
@@ -72,20 +75,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         while (!carCursor.isAfterLast()) {
             // формируем список возможных марок автомобилей с удалением кавычек
             marks.add(deleteQuotes(carCursor.getString(1)));
-            // формируем список возможных цен автомобилей
-            prices.add(carCursor.getDouble(2));
             // переход на следующую запись
             carCursor.moveToNext();
         }
         // закрываем курсор
         carCursor.close();
 
+        ArrayList<String> listMarks = new ArrayList<>(marks);
         // устанавливаем записи о марках автомобилей в выпадающий список
-        Spinner spinner = (Spinner) findViewById(R.id.markSpinner);
-        spinnerSetAdapter(spinner, new ArrayList<>(marks));
+        Spinner spinner = findViewById(R.id.markSpinner);
+        spinnerSetAdapter(spinner, listMarks);
 
         // устанавливаем подсказки о доступных ценах автомобилей
-        setHintPrice(prices);
+        setHintPrice(listMarks.get(0));
     }
 
     // устанавливает записи о марках автомобилей в выпадающий список
@@ -97,10 +99,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Применяем адаптер к элементу spinner
         spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            // обработка выбора элемента из списка
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Получаем выбранный объект
+                currentMark = (String)parent.getItemAtPosition(position);
+                setHintPrice(currentMark);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
     }
 
     // устанавливает подсказки о доступных ценах автомобилей
-    void setHintPrice(ArrayList<Double> prices) {
+    void setHintPrice(String currentMark) {
+        // хранит список всех цен автомобилей из бд
+        ArrayList<Double> prices = new ArrayList<>();
+
+        Log.d("TAG", "setHintPrice: " + currentMark);
+
+        Cursor carCursor = db.rawQuery("SELECT * FROM cars WHERE mark like '%" + currentMark +"%';", null);
+        // переход на первую запись в таблице
+        carCursor.moveToFirst();
+        while(!carCursor.isAfterLast()){ // пока не конец таблицы
+            // формируем список возможных цен автомобилей
+            prices.add(carCursor.getDouble(2));
+            carCursor.moveToNext(); // переход к следующией записи
+        }
+
+        Log.d("TAG", "setHintPrice: " + currentMark);
+
         double[] minMax = minMax(prices);
 
         TextView startPrice = findViewById(R.id.startPrice);
@@ -204,12 +235,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void addRecords(SQLiteDatabase db) {
         db.execSQL("drop table if exists cars"); // удаляем таблицу cars
         createTable(db); // создаем таблицу cars
-
+        int min = 100;
+        int max = 1000;
         // добавляем записи о машинах
-        //addCar(db, "Audi Q5", 1000000.00, drawableToByteArray(R.mipmap.ic_Audi_Q5_foreground));
-        //addCar(db, "BMW X3", 1000000.00, drawableToByteArray(R.mipmap.ic_bmw_x3_foreground));
-        //addCar(db, "BMW X3", 1000000.00, drawableToByteArray(R.mipmap.ic_daewoo_gentra_2_foreground));
+        addCar(db, "Audi", rnd(min, max), drawableToByteArray(R.mipmap.ic_audi_q5_foreground));
+        addCar(db, "Audi", rnd(min, max), drawableToByteArray(R.mipmap.ic_bmw_x3_foreground));
+        addCar(db, "Audi", rnd(min, max), drawableToByteArray(R.mipmap.ic_daewoo_gentra_2_foreground));
+        addCar(db, "Ford", rnd(min, max), drawableToByteArray(R.mipmap.ic_ford_focus_foreground));
+        addCar(db, "Ford", rnd(min, max), drawableToByteArray(R.mipmap.ic_geely_tugella_foreground));
+        addCar(db, "Ford", rnd(min, max), drawableToByteArray(R.mipmap.ic_kia_sportage_foreground));
+        addCar(db, "Nissan", rnd(min, max), drawableToByteArray(R.mipmap.ic_mitsubishi_outlander_foreground));
+        addCar(db, "Nissan", rnd(min, max), drawableToByteArray(R.mipmap.ic_subaru_outback_foreground));
+        addCar(db, "Nissan", rnd(min, max), drawableToByteArray(R.mipmap.ic_uas_patriot_foreground));
+        addCar(db, "Nissan", rnd(min, max), drawableToByteArray(R.mipmap.ic_volkswagen_polo_5_foreground));
 
+    }
+    // функция возвращаяющая случайное число в заданном диапазоне
+    static double rnd(int min, int max) {
+        max -= min;
+        return Math.round((int)((Math.random() * ++max) + min) * 1000000) / 100;
     }
 
     // переводит картинку в набор байт, для хранения этого набора в таблице SQLite
@@ -248,20 +292,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     public void find() {
-        currentCarId = 0;
         TextView startPrice = findViewById(R.id.startPrice);
         TextView endPrice = findViewById(R.id.endPrice);
+        Spinner spinner = findViewById(R.id.markSpinner);
 
-        Log.d("TAG", "find: " + priceToDouble(startPrice.getText()));
+        Log.d("TAG", "find: " + currentMark);
 
-        fillCars(priceToDouble(startPrice.getText()), priceToDouble(endPrice.getText()));
+        // проверяем, что в поле ввода записано число
+        if (!isValid(startPrice, endPrice)) {
+            Toast.makeText(this, "Ожидалось число", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        // проверяем, что нашлись записи удовлетворяющие условию
+        ArrayList<Car> tempCars =
+                getCars("", priceToDouble(startPrice.getText()), priceToDouble(endPrice.getText()));
+        if (tempCars.isEmpty()) {
+            Toast.makeText(this, "Записи в заданном диапазоне цен не найдены", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        currentCarId = 0;
+        cars = tempCars;
+
         setDataFromCursor();
         showInformation();
     }
 
-    void fillCars(double startPrice, double endPrice) {
-        cars.clear();
-        Cursor carCursor = db.rawQuery("SELECT * FROM cars WHERE price BETWEEN "
+    // проверяет есть ли в текстовых полях некорректные символы
+    // согласно регулярному выражению в поле можно записать только числа
+    boolean isValid(TextView startPrice, TextView endPrice){
+        return startPrice.getText().toString().matches("^-?\\d+\\.?\\d{0,2}$") &&
+                 endPrice.getText().toString().matches("^-?\\d+\\.?\\d{0,2}$");
+    }
+
+    ArrayList<Car> getCars(String mark, double startPrice, double endPrice) {
+        ArrayList<Car> cars = new ArrayList<>();
+        Cursor carCursor = db.rawQuery("SELECT * FROM cars WHERE mark like '%" + currentMark + "%' and price BETWEEN "
                 + startPrice + " AND " + endPrice + ";", null);
         // переход на первую запись в таблице
         carCursor.moveToFirst();
@@ -274,6 +340,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             carCursor.moveToNext(); // переход к следующией записи
         }
         carCursor.close();
+        return cars;
     }
 
     // для удобного хранения записей об автомобиле

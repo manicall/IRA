@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // открытие базы данных
-        db = getBaseContext().openOrCreateDatabase("app.db", MODE_PRIVATE, null);
+        db = openOrCreateDatabase("app.db", MODE_PRIVATE, null);
         // создание записей в базе данных
         addRecords(db);
 

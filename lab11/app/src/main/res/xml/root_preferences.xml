@@ -1,0 +1,36 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Редактирование текстового поля">
+
+        <com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+            android:key="background_color"
+            app:title="Цвет фона" />
+        <com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+            android:key="font_color"
+            app:title="Цвет шрифта" />
+        <EditTextPreference
+
+            android:defaultValue="14"
+            android:key="text_size"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Размер шрифта" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="путь к файлу">
+
+        <EditTextPreference
+            android:defaultValue="sdcard/"
+            android:key="folder_name"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="имя папки" />
+        <EditTextPreference
+            android:defaultValue="defaultFile.txt"
+            android:key="file_name"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="имя файла"
+            />
+    </PreferenceCategory>
+
+</PreferenceScreen>

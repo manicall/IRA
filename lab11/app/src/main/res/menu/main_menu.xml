@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item
+        android:id="@+id/menuWrite"
+        android:title="Записать"
+        />
+    <item
+        android:id="@+id/menuRead"
+        android:title="Прочитать"
+        />
+    <item
+        android:id="@+id/menuSettings"
+        android:title="Настройки"
+        />
+
+</menu>
